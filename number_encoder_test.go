@@ -1,4 +1,4 @@
-package encoders
+package pdf417
 
 import (
 	"testing"
@@ -41,7 +41,7 @@ func TestNumberEncoder_Encode(t *testing.T) {
 
 	encoder := CreateNumberEncoder()
 
-	assert.Equal([]int64{902, 112, 434}, encoder.Encode("01234", true))
-	assert.Equal([]int64{112, 434}, encoder.Encode("01234", false))
+	assert.Equal([]int{902, 112, 434}, encoder.Encode("01234", true))
+	assert.Equal([]int{112, 434}, encoder.Encode("01234", false))
 
 }

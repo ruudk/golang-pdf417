@@ -1,7 +1,7 @@
-package encoders
+package pdf417
 
 // Code word used to switch to Text mode.
-const TEXT_SWITCH_CODE_WORD int64 = 900
+const TEXT_SWITCH_CODE_WORD int = 900
 
 // Since each code word consists of 2 characters, a padding value is
 // needed when encoding a single character. 29 is used as padding because
@@ -42,7 +42,7 @@ type TextEncoder struct {
 	CharacterTables map[string][]string
 	Switching       map[string]map[string][]string
 	SwitchSubmode   map[string]string
-	ReverseLookup   map[string]map[string]int64
+	ReverseLookup   map[string]map[string]int
 }
 
 func CreateTextEncoder() *TextEncoder {
@@ -117,38 +117,42 @@ func CreateTextEncoder() *TextEncoder {
 		SWITCH_MIXED: SUBMODE_MIXED,
 	}
 
-	encoder.ReverseLookup = make(map[string]map[string]int64)
+	encoder.ReverseLookup = make(map[string]map[string]int)
 	for submode, codes := range encoder.CharacterTables {
 		for row, char := range codes {
 			if encoder.ReverseLookup[char] == nil {
-				encoder.ReverseLookup[char] = make(map[string]int64)
+				encoder.ReverseLookup[char] = make(map[string]int)
 			}
 
-			encoder.ReverseLookup[char][submode] = int64(row)
+			encoder.ReverseLookup[char][submode] = int(row)
 		}
 	}
 
 	return encoder
 }
 
+func (encoder TextEncoder) GetName() string {
+	return "text"
+}
+
 func (encoder TextEncoder) CanEncode(char string) bool {
 	return encoder.ReverseLookup[char] != nil
 }
 
-func (TextEncoder) GetSwitchCode(data string) int64 {
+func (TextEncoder) GetSwitchCode(data string) int {
 	return TEXT_SWITCH_CODE_WORD
 }
 
-func (encoder TextEncoder) Encode(data string, addSwitchCode bool) []int64 {
-	interim := encodeint64erim(encoder, data);
+func (encoder TextEncoder) Encode(data string, addSwitchCode bool) []int {
+	interim := encodeinterim(encoder, data);
 
 	return encodeFinal(interim, addSwitchCode)
 }
 
-func encodeint64erim(encoder TextEncoder, data string) []int64 {
+func encodeinterim(encoder TextEncoder, data string) []int {
 	submode := SUBMODE_UPPER
 
-	codes := []int64{}
+	codes := []int{}
 
 	for i := 0; i < len(data); i++ {
 		char := string(data[i])
@@ -186,10 +190,10 @@ func getSubmode(encoder TextEncoder, char string) string {
 	return "INVALID"
 }
 
-func getSwitchCodes(encoder TextEncoder, from string, to string) []int64 {
+func getSwitchCodes(encoder TextEncoder, from string, to string) []int {
 	switches := encoder.Switching[from][to]
 
-	codes := []int64{}
+	codes := []int{}
 
 	for _, switcher := range switches {
 		codes = append(codes, getCharacterCode(encoder, switcher, from))
@@ -200,15 +204,15 @@ func getSwitchCodes(encoder TextEncoder, from string, to string) []int64 {
 	return codes
 }
 
-func encodeFinal(codes []int64, addSwitchCode bool) []int64 {
-	codeWords := []int64{}
+func encodeFinal(codes []int, addSwitchCode bool) []int {
+	codeWords := []int{}
 
 	if addSwitchCode {
 		codeWords = append(codeWords, TEXT_SWITCH_CODE_WORD)
 	}
 
-	chunks := [][]int64{}
-	chunkPart := []int64{}
+	chunks := [][]int{}
+	chunkPart := []int{}
 	i := 0
 	for _, code := range codes {
 		chunkPart = append(chunkPart, code)
@@ -218,7 +222,7 @@ func encodeFinal(codes []int64, addSwitchCode bool) []int64 {
 		if i % 2 == 0 {
 			chunks = append(chunks, chunkPart)
 
-			chunkPart = []int64{}
+			chunkPart = []int{}
 		}
 	}
 
@@ -240,7 +244,7 @@ func encodeFinal(codes []int64, addSwitchCode bool) []int64 {
 	return codeWords
 }
 
-func getCharacterCode(encoder TextEncoder, char string, submode string) int64 {
+func getCharacterCode(encoder TextEncoder, char string, submode string) int {
 	cw, ok := encoder.ReverseLookup[char][submode]
 
 	if ! ok {

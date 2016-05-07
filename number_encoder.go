@@ -1,4 +1,4 @@
-package encoders
+package pdf417
 
 import (
 	"regexp"
@@ -6,7 +6,7 @@ import (
 	"math/big"
 )
 
-const NUMBER_SWITCH_CODE_WORD int64 = 902
+const NUMBER_SWITCH_CODE_WORD int = 902
 
 type NumberEncoder struct {
 
@@ -16,7 +16,11 @@ func CreateNumberEncoder() *NumberEncoder {
 	return new(NumberEncoder)
 }
 
-func (NumberEncoder) CanEncode(char string) bool {
+func (encoder NumberEncoder) GetName() string {
+	return "number"
+}
+
+func (encoder NumberEncoder) CanEncode(char string) bool {
 	match, err := regexp.MatchString("^[0-9]{1}$", char)
 
 	if err != nil {
@@ -26,15 +30,15 @@ func (NumberEncoder) CanEncode(char string) bool {
 	return match
 }
 
-func (NumberEncoder) GetSwitchCode(data string) int64 {
+func (encoder NumberEncoder) GetSwitchCode(data string) int {
 	return NUMBER_SWITCH_CODE_WORD
 }
 
-func (NumberEncoder) Encode(digits string, addSwitchCode bool) []int64 {
+func (encoder NumberEncoder) Encode(digits string, addSwitchCode bool) []int {
 	digitCount := len(digits)
 	chunkCount := int(math.Ceil(float64(digitCount) / float64(44)))
 
-	codeWords := []int64{}
+	codeWords := []int{}
 
 	if (addSwitchCode) {
 		codeWords = append(codeWords, NUMBER_SWITCH_CODE_WORD)
@@ -56,7 +60,7 @@ func (NumberEncoder) Encode(digits string, addSwitchCode bool) []int64 {
 	return codeWords
 }
 
-func encodeChunk(chunkInput string) []int64 {
+func encodeChunk(chunkInput string) []int {
 	chunk := big.NewInt(0)
 
 	_, ok := chunk.SetString("1" + chunkInput, 10)
@@ -65,7 +69,7 @@ func encodeChunk(chunkInput string) []int64 {
 		panic("Failed converting")
 	}
 
-	cws := []int64{}
+	cws := []int{}
 
 	for chunk.Cmp(big.NewInt(0)) > 0 {
 		newChunk, cw := chunk.DivMod(
@@ -76,7 +80,7 @@ func encodeChunk(chunkInput string) []int64 {
 
 		chunk = newChunk
 
-		cws = append([]int64{cw.Int64()}, cws...)
+		cws = append([]int{int(cw.Int64())}, cws...)
 	}
 
 	return cws

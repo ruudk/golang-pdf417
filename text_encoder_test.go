@@ -1,4 +1,4 @@
-package encoders
+package pdf417
 
 import (
 	"testing"
@@ -40,8 +40,8 @@ func TestTextEncoder_Encode(t *testing.T) {
 
 	encoder := CreateTextEncoder()
 
-	assert.Equal([]int64{900, 567, 615, 137, 808, 760}, encoder.Encode("Super !", true))
-	assert.Equal([]int64{567, 615, 137, 808, 760}, encoder.Encode("Super !", false))
+	assert.Equal([]int{900, 567, 615, 137, 808, 760}, encoder.Encode("Super !", true))
+	assert.Equal([]int{567, 615, 137, 808, 760}, encoder.Encode("Super !", false))
 }
 
 func TestTextEncoder_Encode2(t *testing.T) {
@@ -49,6 +49,6 @@ func TestTextEncoder_Encode2(t *testing.T) {
 
 	encoder := CreateTextEncoder()
 
-	assert.Equal([]int64{900, 567, 615, 137, 809}, encoder.Encode("Super ", true))
-	assert.Equal([]int64{567, 615, 137, 809}, encoder.Encode("Super ", false))
+	assert.Equal([]int{900, 567, 615, 137, 809}, encoder.Encode("Super ", true))
+	assert.Equal([]int{567, 615, 137, 809}, encoder.Encode("Super ", false))
 }
