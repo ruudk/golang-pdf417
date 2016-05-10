@@ -2,7 +2,7 @@ package pdf417
 
 import (
 	"math"
-	"log"
+	"strconv"
 )
 
 const MIN_COLUMNS = 1;
@@ -79,8 +79,6 @@ func Encode(data string) *Barcode {
 	barcode.Rows = rows
 	barcode.Codes = codes
 	barcode.CodeWords = codeWords
-
-	log.Printf("%v", barcode)
 
 	return barcode
 }
@@ -575,6 +573,22 @@ func getCode(tableId int, word int) int {
 	return codes[tableId][word]
 }
 
-//func (barcode Barcode) PixelGrid() [][]bool {
-//
-//}
+func (barcode Barcode) PixelGrid() [][]bool {
+	pixelGrid := [][]bool{}
+
+	for _, row := range barcode.Codes {
+		pixelRow := []bool{}
+		for _, value := range row {
+			bin := strconv.FormatInt(int64(value), 2)
+			length := len(bin)
+
+			for i := 0; i < length; i++ {
+				pixelRow = append(pixelRow, string(bin[i]) == "1")
+			}
+		}
+
+		pixelGrid = append(pixelGrid, pixelRow)
+	}
+
+	return pixelGrid
+}
