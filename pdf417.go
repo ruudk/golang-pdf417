@@ -3,6 +3,9 @@ package pdf417
 import (
 	"math"
 	"strconv"
+	"github.com/boombuler/barcode"
+	"image"
+	"image/color"
 )
 
 const MIN_COLUMNS = 1;
@@ -13,7 +16,6 @@ const MIN_SECURITY_LEVEL = 0;
 const MAX_SECURITY_LEVEL = 8;
 const DEFAULT_SECURITY_LEVEL = 2;
 
-// TODO: Check barcode respects rows/codeword limits.
 const MIN_ROWS = 3;
 const MAX_ROWS = 90;
 const MAX_CODE_WORDS = 925;
@@ -30,6 +32,39 @@ type Barcode struct {
 	Rows int
 	Codes [][]int
 	SecurityLevel int
+	pixelGrid [][]bool
+}
+
+func (c *Barcode) Metadata() barcode.Metadata {
+	return barcode.Metadata{"Pdf417", 2}
+}
+
+func (c *Barcode) Content() string {
+	return c.Data
+}
+
+func (c *Barcode) CheckSum() int {
+	return 0
+}
+
+func (c *Barcode) ColorModel() color.Model {
+	return color.Gray16Model
+}
+
+func (c *Barcode) Bounds() image.Rectangle {
+	grid := c.PixelGrid()
+
+	return image.Rect(0, 0, len(grid[0]), len(grid))
+}
+
+func (c *Barcode) At(x, y int) color.Color {
+	grid := c.PixelGrid()
+
+	if grid[y] != nil && grid[y][x] == true {
+		return color.Black
+	}
+
+	return color.White
 }
 
 func Encode(data string) *Barcode {
@@ -73,7 +108,7 @@ func Encode(data string) *Barcode {
 
 		rowCodes = append(rowCodes, STOP_CHARACTER)
 
-		codes = append(codes, rowCodes)
+		codes = append(codes, rowCodes, rowCodes, rowCodes)
 	}
 
 	barcode.Rows = rows
@@ -573,8 +608,12 @@ func getCode(tableId int, word int) int {
 	return codes[tableId][word]
 }
 
-func (barcode Barcode) PixelGrid() [][]bool {
-	pixelGrid := [][]bool{}
+func (barcode *Barcode) PixelGrid() [][]bool {
+	if len(barcode.pixelGrid) != 0 {
+		return barcode.pixelGrid
+	}
+
+	barcode.pixelGrid = [][]bool{}
 
 	for _, row := range barcode.Codes {
 		pixelRow := []bool{}
@@ -583,12 +622,12 @@ func (barcode Barcode) PixelGrid() [][]bool {
 			length := len(bin)
 
 			for i := 0; i < length; i++ {
-				pixelRow = append(pixelRow, string(bin[i]) == "1")
+				pixelRow = append(pixelRow, bin[i] == 49)
 			}
 		}
 
-		pixelGrid = append(pixelGrid, pixelRow)
+		barcode.pixelGrid = append(barcode.pixelGrid, pixelRow)
 	}
 
-	return pixelGrid
+	return barcode.pixelGrid
 }
