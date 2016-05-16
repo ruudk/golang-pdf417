@@ -67,11 +67,11 @@ func (c *Barcode) At(x, y int) color.Color {
 	return color.White
 }
 
-func Encode(data string) *Barcode {
+func Encode(data string, columns int, securityLevel int) *Barcode {
 	barcode := new(Barcode)
 	barcode.Data = data
-	barcode.Columns = DEFAULT_COLUMNS
-	barcode.SecurityLevel = DEFAULT_SECURITY_LEVEL
+	barcode.Columns = columns
+	barcode.SecurityLevel = securityLevel
 
 	codeWords := encodeData(barcode)
 
