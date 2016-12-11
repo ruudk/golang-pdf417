@@ -8,7 +8,7 @@ import (
 func TestEncode2(t *testing.T) {
 	assert := assert.New(t)
 
-	barcode := Encode("Ruud")
+	barcode := Encode("Ruud", 6, 2)
 
 	assert.Equal(barcode.Data, "Ruud")
 	assert.Equal(barcode.Columns, DEFAULT_COLUMNS)
