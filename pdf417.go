@@ -108,7 +108,7 @@ func Encode(data string, columns int, securityLevel int) *Barcode {
 
 		rowCodes = append(rowCodes, STOP_CHARACTER)
 
-		codes = append(codes, rowCodes, rowCodes, rowCodes)
+		codes = append(codes, rowCodes)
 	}
 
 	barcode.Rows = rows
