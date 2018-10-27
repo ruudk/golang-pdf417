@@ -11,4 +11,3 @@ I only needed a way to draw PDF417 barcodes onto a [FPDF](https://github.com/jun
 See example: [examples/fpdf.go](examples/fpdf.go)
 
 If you want to export the barcode to an image, you have to create something that puts the PixelGrid onto the image. If you find a way, please submit a PR :)
-
