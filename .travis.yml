@@ -2,3 +2,24 @@ language: go
 
 go:
   - 1.11
+
+env:
+  global:
+    - GO111MODULE=on
+    - REVIEWDOG_VERSION="0.9.11"
+
+install:
+  - mkdir -p ~/bin/ && export export PATH="~/bin/:$PATH"
+  - curl -fSL https://github.com/haya14busa/reviewdog/releases/download/$REVIEWDOG_VERSION/reviewdog_linux_amd64 -o ~/bin/reviewdog && chmod +x ~/bin/reviewdog
+  - go mod download
+  # Install linters.
+  - go get github.com/golang/lint/golint
+  - go get github.com/kisielk/errcheck
+  - go get honnef.co/go/tools/cmd/gosimple
+  - go get honnef.co/go/tools/cmd/staticcheck
+  - go get honnef.co/go/tools/cmd/unused
+  - go get mvdan.cc/unparam
+
+script:
+  - go test -v -race $(go list ./... | grep -v "/examples" | grep -v "/vendor/")
+  - reviewdog -conf=.reviewdog.yml -reporter=github-pr-check
