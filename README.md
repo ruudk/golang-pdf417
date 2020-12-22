@@ -1,5 +1,7 @@
 # PDF417 barcodes in Golang
 
+![CI](https://github.com/ruudk/golang-pdf417/workflows/CI/badge.svg)
+
 This is a port of https://github.com/ihabunek/pdf417-php
 
 This library encodes data to a PixelGrid that can be used to display the barcode.
