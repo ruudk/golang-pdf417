@@ -1,5 +1,7 @@
 module github.com/ruudk/golang-pdf417
 
+go 1.15
+
 require (
 	github.com/boombuler/barcode v1.0.0
 	github.com/davecgh/go-spew v1.1.0 // indirect
